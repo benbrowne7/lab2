@@ -19,6 +19,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Convert RGB to GRAY')
 parser.add_argument('-name', '-n', type=str, default='car1.png')
+parser.add_argument('-filters', '-f', type=int, default=1)
 args = parser.parse_args()
 
 # ==================================================
@@ -74,6 +75,8 @@ def GaussianBlur(input, size):
 # ==== MAIN ==============================================
 
 imageName = args.name
+numfilters = args.filters
+x = 0
 
 # ignore if no such file is present.
 if not os.path.isfile(imageName):
@@ -92,8 +95,17 @@ if not (type(image) is np.ndarray):
 gray_image = cv2.cvtColor( image, cv2.COLOR_BGR2GRAY );
 gray_image = gray_image.astype(np.float32)
 
-# apply Gaussian blur
-carBlurred = GaussianBlur(gray_image,23);
+
+#apply Gaussian Blur parameter '-f' times
+while x < numfilters:
+	if x == 0:
+		carBlurred = gray_image
+	carBlurred = GaussianBlur(carBlurred,7)
+	x = x + 1
+	
 # save image
-cv2.imwrite( "blur.jpg", carBlurred );
+carSharp = gray_image + (gray_image - carBlurred)
+
+
+cv2.imwrite("sharp50smallkernel.jpg", carSharp);
 
